@@ -1,28 +1,30 @@
 import { Entity } from './Entity.js';
 
-export class Player extends Entity {
-    constructor() {
+export class Projectile extends Entity {
+    constructor(x, y, velocityY, owner) {
         const sprite = new Image();
-        sprite.src = '../../public/assets/sprites/spaceship.png';
+        sprite.src = '../../public/assets/sprites/laser.png';
 
         sprite.onload = () => {
-            const spriteScale = 1;
+            const spriteScale = 0.75;
             this.sprite = sprite;
             this.width = sprite.width * spriteScale;
-            this.height = sprite.height * spriteScale;  
+            this.height = sprite.height * spriteScale;
+            // Center the sprite
+            this.position.x -= this.width / 2;
         }
 
-        const posXOffset = 30;
         const initialPosition = {
-            x: window.innerWidth / 2 - sprite.width / 2,
-            y: window.innerHeight - sprite.height - posXOffset,
+            x: x,
+            y: y,
         };
         const initialVelocity = {
             x: 0,
-            y: 0,
+            y: velocityY,
         };
-
         super(initialPosition, initialVelocity);
+
+        this.owner = owner;
     }
 
     update(canvas) {
