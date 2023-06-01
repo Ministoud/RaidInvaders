@@ -21,20 +21,47 @@ export class Player extends Entity {
             x: 0,
             y: 0,
         };
-
         super(initialPosition, initialVelocity);
+
+        this.targetX = null;
+        this.targetY = null;
     }
 
-    update(canvas) {
+    moveTo(posX = null, posY = null) {
+        this.targetX = posX !== null ? posX - this.width / 2 : null;
+        this.targetY = posY !== null ? posY - this.height / 2 : null;
+    }
+
+    update(canvasContext) {
+        const movementSpeed = 5;
+        if (this.targetX !== null) {
+            if (this.position.x > this.targetX + movementSpeed) {
+                this.velocity.x = -movementSpeed;
+            } else if (this.position.x < this.targetX - movementSpeed) {
+                this.velocity.x = movementSpeed;
+            } else {
+                this.velocity.x = 0;
+                this.targetX = null;
+            }
+        }
+
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
 
-        this.draw(canvas);
+        if (this.position.x < 0) {
+            this.position.x = 0;
+            this.targetX = null;
+        } else if (this.position.x > canvasContext.canvas.width - this.width) {
+            this.position.x = canvasContext.canvas.width - this.width;
+            this.targetX = null;
+        }
+
+        this.draw(canvasContext);
     }
 
-    draw(canvas) {
+    draw(canvasContext) {
         if (this.sprite) {
-            canvas.drawImage(this.sprite, this.position.x, this.position.y, this.width, this.height);
+            canvasContext.drawImage(this.sprite, this.position.x, this.position.y, this.width, this.height);
         }
     }
 }

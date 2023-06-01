@@ -1,7 +1,7 @@
 import { Entity } from './Entity.js';
 
 export class Projectile extends Entity {
-    constructor(x, y, velocityY, owner) {
+    constructor(posX, posY, velocityY, owner) {
         const sprite = new Image();
         sprite.src = '../../public/assets/sprites/laser.png';
 
@@ -15,8 +15,8 @@ export class Projectile extends Entity {
         }
 
         const initialPosition = {
-            x: x,
-            y: y,
+            x: posX,
+            y: posY,
         };
         const initialVelocity = {
             x: 0,
@@ -27,16 +27,16 @@ export class Projectile extends Entity {
         this.owner = owner;
     }
 
-    update(canvas) {
+    update(canvasContext) {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
 
-        this.draw(canvas);
+        this.draw(canvasContext);
     }
 
-    draw(canvas) {
+    draw(canvasContext) {
         if (this.sprite) {
-            canvas.drawImage(this.sprite, this.position.x, this.position.y, this.width, this.height);
+            canvasContext.drawImage(this.sprite, this.position.x, this.position.y, this.width, this.height);
         }
     }
 }

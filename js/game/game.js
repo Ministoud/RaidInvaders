@@ -19,7 +19,7 @@ entities.push(player);
 
 function update() {
     requestAnimationFrame(update);
-    canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
     entities.forEach(entity => {
         // Update the entity
         entity.update(canvasContext);
@@ -30,21 +30,14 @@ function update() {
     });
 }
 
-// Detect mouse mouvement and change player's position accordingly
+// Detect mouse mouvement and change player's position accordingly without letting the player go out of the canvas
 addEventListener('mousemove', ({ clientX }) => {
-    // Move the player horizontally with the mouse position without letting the player go out of the canvas
-    if (clientX - player.width / 2 < 0) {
-        player.position.x = 0;
-    } else if (clientX + player.width / 2 > canvas.width) {
-        player.position.x = canvas.width - player.width;
-    } else {
-        player.position.x = clientX - player.width / 2;
-    }
+    player.moveTo(clientX);
 });
 
-// Detect spacebar and shoot a projectile
+// Detect mouse click and shoot a projectile
 addEventListener('mouseup', () => {
-        // Spawn a projectile
-        const projectile = new Projectile(player.position.x + player.width / 2, player.position.y, -10, player);
-        entities.push(projectile);
+    const projectileVelocity = -10;
+    const projectile = new Projectile(player.position.x + player.width / 2, player.position.y, projectileVelocity, player);
+    entities.push(projectile);
 })
