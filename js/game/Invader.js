@@ -1,30 +1,26 @@
-import { Entity } from './Entity.js';
+import { Entity } from "./Entity.js";
 
-export class Projectile extends Entity {
-    constructor(posX, posY, velocityY, owner) {
+export class Invader extends Entity {
+    constructor(posX) {
         const sprite = new Image();
-        sprite.src = '../../public/assets/sprites/laser.png';
+        sprite.src = "../../public/assets/sprites/invader.png";
 
         sprite.onload = () => {
-            const spriteScale = 1;
+            const spriteScale = 1.5;
             this.sprite = sprite;
             this.width = sprite.width * spriteScale;
-            this.height = sprite.height * spriteScale;
-            // Center the sprite
-            this.position.x -= this.width / 2;
+            this.height = sprite.height * spriteScale;  
         }
 
         const initialPosition = {
             x: posX,
-            y: posY,
+            y: 0,
         };
         const initialVelocity = {
             x: 0,
-            y: velocityY,
+            y: 1,
         };
         super(initialPosition, initialVelocity);
-
-        this.owner = owner;
     }
 
     update(canvasContext) {
