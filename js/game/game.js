@@ -14,6 +14,9 @@ canvas.height = window.innerHeight;
 let entities = [];
 
 function update() {
+    // Start image calculation timer at the beginning of the frame [DEBUG]
+    const now = Date.now();
+
     requestAnimationFrame(update);
     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
     entities.forEach(entity => {
@@ -22,12 +25,63 @@ function update() {
         if (entity.position.y > canvas.height || entity.position.y < 0 || entity.position.x < 0 || entity.position.x > canvas.width) {
             eventHelper.sendEvent("removeEntity", entity);
         }
+
+        // Handle collisions between entities
+        if (entity instanceof Projectile) {
+            entities.forEach(otherEntity => {
+                if (entity !== otherEntity && doesOverlap(entity, otherEntity)) {
+                    switch(otherEntity.constructor) {
+                        case Invader:
+                            if (entity.owner instanceof Player) {
+                                console.log('invader hit');
+                                eventHelper.sendEvent("removeEntity", entity);
+                                eventHelper.sendEvent("removeEntity", otherEntity);
+                            }
+                            break;
+
+                        case Player:
+                            if (entity.owner instanceof Invader) {
+                                console.log('player hit');
+                                eventHelper.sendEvent("removeEntity", entity);
+                                eventHelper.sendEvent("removeEntity", otherEntity);
+                            }
+                            break;
+
+                        case Projectile:
+                            if (entity.owner instanceof Invader && otherEntity.owner instanceof Player || entity.owner instanceof Player && otherEntity.owner instanceof Invader) {
+                                console.log('Projectile hit');
+                                eventHelper.sendEvent("removeEntity", entity);
+                                eventHelper.sendEvent("removeEntity", otherEntity);
+                            }
+                            break;
+
+                        default:
+                            console.error(`Unknown entity type`, otherEntity.constructor);
+                            break;
+                    }
+                }
+            })
+        } else if (entity instanceof Invader && doesOverlap(entity, player)) {
+            eventHelper.sendEvent("removeEntity", entity);
+            eventHelper.sendEvent("removeEntity", player);
+        }
     });
 
-    // Show number of entities on the screen
+    // Show number of entities on the screen [DEBUG]
     canvasContext.fillText(`Entities: ${entities.length}`, 10, 20);
+
+    // Show how many ms it takes to update the canvas [DEBUG]
+    canvasContext.fillText(`Update time: ${Date.now() - now}ms`, 10, 40);
 }
 
+function doesOverlap(entity1, entity2) {
+    return (
+        entity1.position.x < entity2.position.x + entity2.width &&
+        entity1.position.x + entity1.width > entity2.position.x &&
+        entity1.position.y < entity2.position.y + entity2.height &&
+        entity1.position.y + entity1.height > entity2.position.y
+    );
+}
 
 // Detect mouse mouvement and change player's position accordingly without letting the player go out of the canvas
 eventHelper.listenEvent('mousemove', ({ clientX }) => {
@@ -57,7 +111,11 @@ eventHelper.listenEvent('addEntity', ({ detail }) => {
 eventHelper.listenEvent('removeEntity', ({ detail }) => {
     // Avoid flickering when removing entities
     setTimeout(() => {
-        entities.splice(entities.indexOf(detail), 1);
+        // Get true index of the entity in the entities array
+        const entityFound = entities.find(entity => entity === detail);
+        if (entityFound) {
+            entities.splice(entities.indexOf(entityFound), 1);
+        }
     }, 0);
 })
 
