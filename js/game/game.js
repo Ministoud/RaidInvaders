@@ -33,7 +33,6 @@ function update() {
                     switch(otherEntity.constructor) {
                         case Invader:
                             if (entity.owner instanceof Player) {
-                                console.log('invader hit');
                                 eventHelper.sendEvent("removeEntity", entity);
                                 eventHelper.sendEvent("removeEntity", otherEntity);
                             }
@@ -41,7 +40,6 @@ function update() {
 
                         case Player:
                             if (entity.owner instanceof Invader) {
-                                console.log('player hit');
                                 eventHelper.sendEvent("removeEntity", entity);
                                 eventHelper.sendEvent("removeEntity", otherEntity);
                             }
@@ -49,7 +47,6 @@ function update() {
 
                         case Projectile:
                             if (entity.owner instanceof Invader && otherEntity.owner instanceof Player || entity.owner instanceof Player && otherEntity.owner instanceof Invader) {
-                                console.log('Projectile hit');
                                 eventHelper.sendEvent("removeEntity", entity);
                                 eventHelper.sendEvent("removeEntity", otherEntity);
                             }
@@ -74,6 +71,29 @@ function update() {
     canvasContext.fillText(`Update time: ${Date.now() - now}ms`, 10, 40);
 }
 
+// Add input field with a button on the canvas to spawn certain amount of ennemies [DEBUG]
+let numberOfInvaders = 1;
+let numberOfEnemies = document.getElementById('numberOfEnemies');
+numberOfEnemies.addEventListener('change', (newValue) => {
+    numberOfInvaders = parseInt(newValue.target.value);
+});
+
+// Handle click on start button [DEBUG]
+let startButton = document.getElementById('startButton');
+startButton.addEventListener('click', () => {
+    // Make the max spawn duration depends on a log fonction
+    const logCoefficient = 3;
+    const maxPossibleSpawnTime = Math.log(numberOfInvaders) * logCoefficient + 1;
+    eventHelper.sendEvent("spawnInvaders", { numberOfInvaders, maxPossibleSpawnTime });
+});
+
+// Respawn button for player [DEBUG]
+let respawnButton = document.getElementById('respawnButton');
+respawnButton.addEventListener('click', () => {
+    // player = new Player();
+    eventHelper.sendEvent("addEntity", player);
+});
+
 function doesOverlap(entity1, entity2) {
     return (
         entity1.position.x < entity2.position.x + entity2.width &&
@@ -93,21 +113,14 @@ eventHelper.listenEvent('mouseup', () => {
     const projectileVelocity = -10;
     const projectile = new Projectile(player.position.x + player.width / 2, player.position.y, projectileVelocity, player);
     eventHelper.sendEvent("addEntity", projectile);
-})
-
-// TEMP EVENT FOR TESTING
-eventHelper.listenEvent('keydown', ({ key }) => {
-    if (key === ' ') {
-        const invaderPosX = Math.random() * canvas.width;
-        const invader = new Invader(invaderPosX);
-        eventHelper.sendEvent("addEntity", invader);
-    }
 });
 
+// Add a new entity into the game
 eventHelper.listenEvent('addEntity', ({ detail }) => {
     entities.push(detail);
-})
+});
 
+// Remove an entity from the game
 eventHelper.listenEvent('removeEntity', ({ detail }) => {
     // Avoid flickering when removing entities
     setTimeout(() => {
@@ -117,7 +130,22 @@ eventHelper.listenEvent('removeEntity', ({ detail }) => {
             entities.splice(entities.indexOf(entityFound), 1);
         }
     }, 0);
-})
+});
+
+// Spawn a new round of invaders
+eventHelper.listenEvent('spawnInvaders', ({ detail }) => {
+    const minSpawnTimeInSeconds = 1;
+    for (let i = 0; i < detail.numberOfInvaders; i++) {
+        // Set a random spawn time between min and max
+        const timeBeforeSpawning = Math.random() * (detail.maxPossibleSpawnTime - minSpawnTimeInSeconds) + minSpawnTimeInSeconds;
+
+        setTimeout(() => {
+            const invaderPosX = Math.random() * canvas.width;
+            const invader = new Invader(invaderPosX, detail.spawnTimeInSeconds);
+            eventHelper.sendEvent("addEntity", invader);
+        }, timeBeforeSpawning * 1000);
+    };
+});
 
 // Spawn a player
 const player = new Player();
