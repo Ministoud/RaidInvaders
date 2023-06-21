@@ -7,3 +7,16 @@ html, body, canvas {
     height: 100%;
     overflow: hidden;
 }
+
+/* Temp CSS for debug controls */
+.debugControls {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    /* justifiy content in the right; */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    z-index: 1;
+}

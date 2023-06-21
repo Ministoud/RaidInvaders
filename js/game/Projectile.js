@@ -6,7 +6,7 @@ export class Projectile extends Entity {
         sprite.src = '../../public/assets/sprites/laser.png';
 
         sprite.onload = () => {
-            const spriteScale = 0.75;
+            const spriteScale = 1;
             this.sprite = sprite;
             this.width = sprite.width * spriteScale;
             this.height = sprite.height * spriteScale;

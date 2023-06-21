@@ -8,6 +8,19 @@
     <title>Raid Invaders</title>
 </head>
 <body>
+    <!-- Temp debug controls -->
+    <div class="debugControls">
+        <!-- Input for number or ennemies to spawn -->
+        <label for="numberOfEnemies">Number of Enemies for the next round:</label>
+        <div>
+            <input type="number" id="numberOfEnemies" min="1" max="100" value="1">
+            <button id="startButton">Start</button>
+        </div>
+        <br>
+        <!-- Respawn the player -->
+        <button id="respawnButton">Respawn</button>
+    </div> 
+
     <canvas>
         <!-- Canvas dynamically generated content -->
     </canvas>
