@@ -4,6 +4,7 @@ import { EventHelper } from "../utils/EventHelper.js";
 
 export class Invader extends Entity {
     constructor(posX) {
+        const maxInitialShootTimeInMs = 1000;
         const sprite = new Image();
         sprite.src = "../../public/assets/sprites/invader.png";
 
@@ -24,13 +25,14 @@ export class Invader extends Entity {
         };
         super(initialPosition, initialVelocity);
         this.timePreviousShot = Date.now();
-        this.timeBeforeNextShot = Math.random() * 1000;
+        this.timeBeforeNextShot = Math.random() * maxInitialShootTimeInMs;
     }
 
     shoot() {
         const projectileVelocity = 1;
+        const maxNextShootTimeInMs = 5000;
         this.timePreviousShot = Date.now();
-        this.timeBeforeNextShot = Math.random() * 5000;
+        this.timeBeforeNextShot = Math.random() * maxNextShootTimeInMs;
 
         const eventHelper = new EventHelper();
         eventHelper.sendEvent("addEntity", new Projectile(this.position.x + this.width / 2, this.position.y + this.height, projectileVelocity + this.velocity.y, this));
