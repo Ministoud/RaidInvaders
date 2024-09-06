@@ -110,6 +110,11 @@ eventHelper.listenEvent('mousemove', ({ clientX }) => {
 
 // Detect mouse click and shoot a projectile
 eventHelper.listenEvent('mouseup', () => {
+    // Prevent player from shooting if he is dead
+    if (!player.alive) {
+        return;
+    }
+
     const projectileVelocity = -10;
     const projectile = new Projectile(player.position.x + player.width / 2, player.position.y, projectileVelocity, player);
     eventHelper.sendEvent("addEntity", projectile);
@@ -127,6 +132,9 @@ eventHelper.listenEvent('removeEntity', ({ detail }) => {
         // Get true index of the entity in the entities array
         const entityFound = entities.find(entity => entity === detail);
         if (entityFound) {
+            if (entityFound instanceof Player) {
+                player.alive = false;
+            }
             entities.splice(entities.indexOf(entityFound), 1);
         }
     }, 0);
